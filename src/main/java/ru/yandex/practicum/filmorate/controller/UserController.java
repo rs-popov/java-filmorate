@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,13 +20,12 @@ public class UserController {
 
     @GetMapping
     public Collection<User> findAll() {
-        log.info("Общее число пользователей {}.", users.size());
         return users.values();
     }
 
     @PostMapping
-    public User create(@RequestBody @NonNull User user) {
-        if (validateUser(user)) {
+    public User create(@Valid @RequestBody User user) {
+        if (validate(user)) {
             users.put(user.getId(), user);
         }
         log.info("Добавлен новый пользователь {}. Общее число пользователей {}",
@@ -34,15 +34,15 @@ public class UserController {
     }
 
     @PutMapping
-    public User put(@RequestBody @NonNull User user) {
-        if (validateUser(user)) {
+    public User put(@Valid @RequestBody User user) {
+        if (validate(user)) {
             users.put(user.getId(), user);
         }
         log.info("Изменен профиль пользователя {}.", user.getLogin());
         return user;
     }
 
-    private boolean validateUser(User user) {
+    private boolean validate(User user) {
         if (user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
             log.warn("Неверный формат электронной почты. Пользователь не был добавлен.");
             throw new ValidationException("Неверный формат электронной почты.");

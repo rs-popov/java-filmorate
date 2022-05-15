@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,13 +20,12 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> findAll() {
-        log.info("Общее число фильмов {}.", films.size());
         return films.values();
     }
 
     @PostMapping
-    public Film create(@RequestBody @NonNull Film film) {
-        if (validateFilm(film)) {
+    public Film create(@Valid @RequestBody Film film) {
+        if (validate(film)) {
             films.put(film.getId(), film);
         }
         log.info("Добавлен фильм {}. Общее число фильмов {}.", film.getName(), films.size());
@@ -33,15 +33,15 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film put(@RequestBody @NonNull Film film) {
-        if (validateFilm(film)) {
+    public Film put(@Valid @RequestBody Film film) {
+        if (validate(film)) {
             films.put(film.getId(), film);
         }
         log.info("Изменен фильм {}.", film.getName());
         return film;
     }
 
-    private boolean validateFilm(Film film) {
+    private boolean validate(Film film) {
         if (film.getName().isEmpty()) {
             log.warn("Пустое название фильма. Фильм не был добавлен.");
             throw new ValidationException("Пустое название фильма.");
