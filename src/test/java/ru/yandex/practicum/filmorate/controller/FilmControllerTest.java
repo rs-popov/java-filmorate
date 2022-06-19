@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 
@@ -13,7 +14,7 @@ public class FilmControllerTest {
 
     @BeforeEach
     void setUp() {
-        filmController = new FilmController();
+        filmController = new FilmController(new InMemoryFilmStorage());
     }
 
     @Test
@@ -22,9 +23,9 @@ public class FilmControllerTest {
                 "filmDescription",
                 LocalDate.of(2020, 10, 16),
                 105);
-        assertFalse(filmController.findAll().contains(film), "Фильм уже добавлен.");
+        assertFalse(filmController.findAllFilms().contains(film), "Фильм уже добавлен.");
         filmController.create(film);
-        assertTrue(filmController.findAll().contains(film), "Фильм не был добавлен.");
+        assertTrue(filmController.findAllFilms().contains(film), "Фильм не был добавлен.");
     }
 
     @Test
@@ -34,12 +35,12 @@ public class FilmControllerTest {
                 LocalDate.of(2020, 10, 16),
                 105);
         filmController.create(film);
-        assertTrue(filmController.findAll().contains(film), "Фильм не добавлен.");
+        assertTrue(filmController.findAllFilms().contains(film), "Фильм не добавлен.");
         film.setDuration(120);
         film.setDescription("NewDescription");
         filmController.put(film);
-        assertTrue(filmController.findAll().contains(film), "Фильм не найден.");
-        Film updFilm = (Film) filmController.findAll().toArray()[0];
+        assertTrue(filmController.findAllFilms().contains(film), "Фильм не найден.");
+        Film updFilm = (Film) filmController.findAllFilms().toArray()[0];
         assertEquals(120, updFilm.getDuration(), "Продолжительность фильма не была обновлена.");
         assertEquals("NewDescription", updFilm.getDescription(), "Описание фильма не была обновлена.");
     }
@@ -47,11 +48,11 @@ public class FilmControllerTest {
     @Test
     void shouldNotCreateFilmWhenNullFilm() {
         Film film = null;
-        assertEquals(0, filmController.findAll().size());
+        assertEquals(0, filmController.findAllFilms().size());
         try {
             filmController.create(film);
         } catch (Exception e) {
-            assertEquals(0, filmController.findAll().size());
+            assertEquals(0, filmController.findAllFilms().size());
         }
     }
 
@@ -65,7 +66,7 @@ public class FilmControllerTest {
         try {
             filmController.create(film);
         } catch (Exception e) {
-            assertFalse(filmController.findAll().contains(film));
+            assertFalse(filmController.findAllFilms().contains(film));
             assertEquals(e.getMessage(), "Пустое название фильма.", "Неверная причина ошибки.");
         }
     }
@@ -83,7 +84,7 @@ public class FilmControllerTest {
         try {
             filmController.create(film);
         } catch (Exception e) {
-            assertFalse(filmController.findAll().contains(film));
+            assertFalse(filmController.findAllFilms().contains(film));
             assertEquals(e.getMessage(), "Слишком длинное описание фильма.", "Неверная причина ошибки.");
         }
     }
@@ -99,7 +100,7 @@ public class FilmControllerTest {
         try {
             filmController.create(film);
         } catch (Exception e) {
-            assertFalse(filmController.findAll().contains(film));
+            assertFalse(filmController.findAllFilms().contains(film));
             assertEquals(e.getMessage(), "Неверная дата выхода фильма.", "Неверная причина ошибки.");
         }
     }
@@ -114,7 +115,7 @@ public class FilmControllerTest {
         try {
             filmController.create(film);
         } catch (Exception e) {
-            assertFalse(filmController.findAll().contains(film));
+            assertFalse(filmController.findAllFilms().contains(film));
             assertEquals(e.getMessage(), "Неверная продолжительность фильма.", "Неверная причина ошибки.");
         }
     }
