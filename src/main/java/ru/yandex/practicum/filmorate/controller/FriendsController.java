@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users/{id}/friends")
@@ -32,9 +31,7 @@ public class FriendsController {
 
     @GetMapping("/common/{otherId}")
     public Collection<User> findCommonFriends(@PathVariable int id, @PathVariable int otherId) {
-        return userService.findAllFriends(id).stream()
-                .filter(user -> userService.findAllFriends(otherId).contains(user))
-                .collect(Collectors.toList());
+        return userService.findCommonFriends(id, otherId);
     }
 
     @DeleteMapping("/{friendId}")

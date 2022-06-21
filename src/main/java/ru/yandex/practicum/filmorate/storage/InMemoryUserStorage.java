@@ -21,11 +21,13 @@ public class InMemoryUserStorage implements UserStorage {
         return globalId++;
     }
 
-    public Collection<User> findAllUsers() {
+    @Override
+    public Collection<User> getAllUsers() {
         return users.values();
     }
 
-    public User findUser(int id) {
+    @Override
+    public User getUserById(int id) {
         if (!users.containsKey(id)) {
             log.warn("Пользователь с id={}  не найден.", id);
             throw new ObjectNotFoundException("Пользователь не найден.");
@@ -33,6 +35,7 @@ public class InMemoryUserStorage implements UserStorage {
         return users.get(id);
     }
 
+    @Override
     public User createUser(User user) {
         if (validate(user)) {
             user.setId(getNextId());
@@ -43,6 +46,7 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
+    @Override
     public User updateUser(User user) {
         if (!users.containsKey(user.getId())) {
             throw new ObjectNotFoundException("Пользователь не найден.");

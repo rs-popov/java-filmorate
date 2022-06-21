@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.InternalErrorException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.*;
@@ -14,22 +14,22 @@ import java.util.*;
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    private final UserStorage userStorage;
+    private final UserService userService;
 
     @Autowired
-    public UserController(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping
     public Collection<User> findAllUsers() {
-        return userStorage.findAllUsers();
+        return userService.getAllUsers();
     }
 
     @GetMapping(value = {"/{id}"})
-    public User findAllUsers(@PathVariable Optional<Integer> id) {
-        if (id.isPresent()) {
-            return userStorage.findUser(id.get());
+    public User findAllUsers(@PathVariable Integer id) {
+        if (id != null) {
+            return userService.getUserById(id);
         } else {
             throw new InternalErrorException("");
         }
@@ -37,13 +37,13 @@ public class UserController {
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
-        userStorage.createUser(user);
+        userService.createUser(user);
         return user;
     }
 
     @PutMapping
     public User put(@Valid @RequestBody User user) {
-        userStorage.updateUser(user);
+        userService.updateUser(user);
         return user;
     }
 }

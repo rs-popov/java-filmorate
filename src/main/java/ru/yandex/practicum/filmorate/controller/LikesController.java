@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/films")
@@ -26,9 +25,9 @@ public class LikesController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> findPopular(@RequestParam Optional<Integer> count) {
-        if (count.isPresent()) {
-            return filmService.findPopular(count.get());
+    public Collection<Film> findPopular(@RequestParam(required = false) Integer count) {
+        if (count!=null) {
+            return filmService.findPopular(count);
         } else {
             return filmService.findPopular(10);
         }

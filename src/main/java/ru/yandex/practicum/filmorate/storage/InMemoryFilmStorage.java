@@ -21,11 +21,13 @@ public class InMemoryFilmStorage implements FilmStorage {
         return globalId++;
     }
 
-    public Collection<Film> findAllFilms() {
+    @Override
+    public Collection<Film> getAllFilms() {
         return films.values();
     }
 
-    public Film findFilm(int id) {
+    @Override
+    public Film getFilmById(int id) {
         if (!films.containsKey(id)) {
             log.warn("Фильм с id " + id + " не найден.");
             throw new ObjectNotFoundException("Фильм не найден.");

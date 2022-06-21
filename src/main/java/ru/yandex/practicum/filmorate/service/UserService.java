@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.InternalErrorException;
-import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -21,39 +20,47 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
+    public Collection<User> getAllUsers() {
+        return userStorage.getAllUsers();
+    }
+
+    public User getUserById(int id) {
+        return userStorage.getUserById(id);
+    }
+
+    public User createUser(User user) {
+        userStorage.createUser(user);
+        return user;
+    }
+
+    public User updateUser(User user) {
+        userStorage.updateUser(user);
+        return user;
+    }
+
     public void addFriends(int userId1, int userId2) {
-        User user1 = userStorage.findUser(userId1);
-        if (user1 == null) {
-            log.warn("Пользователь с id " + userId1 + "не найден.");
-            throw new ObjectNotFoundException("Пользователь не найден.");
-        }
-        User user2 = userStorage.findUser(userId2);
-        if (user2 == null) {
-            log.warn("Пользователь с id " + userId2 + "не найден.");
-            throw new ObjectNotFoundException("Пользователь не найден.");
-        }
+        User user1 = userStorage.getUserById(userId1);
+        User user2 = userStorage.getUserById(userId2);
         user1.addFriend(userId2);
         user2.addFriend(userId1);
         log.info("Пользователь с id={} и пользователь с id={} теперь друзья.", userId1, userId2);
     }
 
     public Collection<User> findAllFriends(int id) {
-        return userStorage.findAllUsers().stream()
-                .filter(user -> userStorage.findUser(id).getFriends().contains(user.getId()))
+        return userStorage.getAllUsers().stream()
+                .filter(user -> userStorage.getUserById(id).getFriends().contains(user.getId()))
+                .collect(Collectors.toList());
+    }
+
+    public Collection<User> findCommonFriends(int id, int otherId) {
+        return findAllFriends(id).stream()
+                .filter(user -> findAllFriends(otherId).contains(user))
                 .collect(Collectors.toList());
     }
 
     public void deleteFriends(int userId1, int userId2) {
-        User user1 = userStorage.findUser(userId1);
-        if (user1 == null) {
-            log.warn("Пользователь с id " + userId1 + "не найден.");
-            throw new ObjectNotFoundException("Пользователь не найден.");
-        }
-        User user2 = userStorage.findUser(userId2);
-        if (user2 == null) {
-            log.warn("Пользователь с id " + userId2 + "не найден.");
-            throw new ObjectNotFoundException("Пользователь не найден.");
-        }
+        User user1 = userStorage.getUserById(userId1);
+        User user2 = userStorage.getUserById(userId2);
         if (!user1.getFriends().contains(userId2) || !user2.getFriends().contains(userId1)) {
             log.warn("Пользователь с id={} и пользователь с id={} не являются друзьями.", userId1, userId2);
             throw new InternalErrorException("Неверные параменты запроса на удаление друзей.");
