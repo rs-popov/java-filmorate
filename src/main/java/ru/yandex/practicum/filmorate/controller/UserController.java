@@ -1,64 +1,49 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.InternalErrorException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    private final Map<Integer, User> users = new HashMap<>();
+    private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
-    public Collection<User> findAll() {
-        return users.values();
+    public Collection<User> findAllUsers() {
+        return userService.getAllUsers();
+    }
+
+    @GetMapping(value = {"/{id}"})
+    public User findAllUsers(@PathVariable Integer id) {
+        if (id != null) {
+            return userService.getUserById(id);
+        } else {
+            throw new InternalErrorException("");
+        }
     }
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
-        if (validate(user)) {
-            users.put(user.getId(), user);
-        }
-        log.info("Добавлен новый пользователь {}. Общее число пользователей {}",
-                user.getLogin(), users.size());
+        userService.createUser(user);
         return user;
     }
 
     @PutMapping
     public User put(@Valid @RequestBody User user) {
-        if (validate(user)) {
-            users.put(user.getId(), user);
-        }
-        log.info("Изменен профиль пользователя {}.", user.getLogin());
+        userService.updateUser(user);
         return user;
-    }
-
-    private boolean validate(User user) {
-        if (user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
-            log.warn("Неверный формат электронной почты. Пользователь не был добавлен.");
-            throw new ValidationException("Неверный формат электронной почты.");
-        }
-        if (user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
-            log.warn("Неверный формат логина. Пользователь не был добавлен.");
-            throw new ValidationException("Неверный формат логина.");
-        }
-        if (user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-            log.warn("Пустое имя пользователя. В качестве имени пользователя был использован логин.");
-        }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.warn("Неверная дата рождения - дата рождения не может быть в будущем. Пользователь не был добавлен.");
-            throw new ValidationException("Неверная дата рождения.");
-        }
-        return true;
     }
 }

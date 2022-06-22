@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
@@ -13,7 +15,7 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        userController = new UserController();
+        userController = new UserController(new UserService(new InMemoryUserStorage()));
     }
 
     @Test
@@ -22,9 +24,9 @@ class UserControllerTest {
                 "userLogin",
                 "UserName",
                 LocalDate.of(2000, 1, 1));
-        assertFalse(userController.findAll().contains(user), "Пользователь уже не был добавлен.");
+        assertFalse(userController.findAllUsers().contains(user), "Пользователь уже не был добавлен.");
         userController.create(user);
-        assertTrue(userController.findAll().contains(user), "Пользователь не был добавлен.");
+        assertTrue(userController.findAllUsers().contains(user), "Пользователь не был добавлен.");
     }
 
     @Test
@@ -34,12 +36,12 @@ class UserControllerTest {
                 "UserName",
                 LocalDate.of(2000, 1, 1));
         userController.create(user);
-        assertTrue(userController.findAll().contains(user), "Пользователь не был добавлен.");
+        assertTrue(userController.findAllUsers().contains(user), "Пользователь не был добавлен.");
         user.setName("updUserName");
         user.setEmail("updUser@mail.ru");
         userController.put(user);
-        assertTrue(userController.findAll().contains(user), "Пользователь не был добавлен.");
-        User updUser = (User) userController.findAll().toArray()[0];
+        assertTrue(userController.findAllUsers().contains(user), "Пользователь не был добавлен.");
+        User updUser = (User) userController.findAllUsers().toArray()[0];
         assertEquals("updUserName", updUser.getName(), "Имя пользователя не было обновлено.");
         assertEquals("updUser@mail.ru", updUser.getEmail(), "Почта пользователя не была обновлена.");
     }
@@ -47,11 +49,11 @@ class UserControllerTest {
     @Test
     void shouldNotAddUserWhenNullUser() {
         User user = null;
-        assertEquals(0, userController.findAll().size());
+        assertEquals(0, userController.findAllUsers().size());
         try {
             userController.create(user);
         } catch (Exception e) {
-            assertEquals(0, userController.findAll().size());
+            assertEquals(0, userController.findAllUsers().size());
         }
     }
 
@@ -65,7 +67,7 @@ class UserControllerTest {
         try {
             userController.create(user);
         } catch (Exception e) {
-            assertFalse(userController.findAll().contains(user), "Пользователь был добавлен.");
+            assertFalse(userController.findAllUsers().contains(user), "Пользователь был добавлен.");
             assertEquals("Неверный формат электронной почты.", e.getMessage(), "Неверная причина ошибки.");
         }
     }
@@ -80,7 +82,7 @@ class UserControllerTest {
         try {
             userController.create(user);
         } catch (Exception e) {
-            assertFalse(userController.findAll().contains(user), "Пользователь был добавлен.");
+            assertFalse(userController.findAllUsers().contains(user), "Пользователь был добавлен.");
             assertEquals("Неверный формат электронной почты.", e.getMessage(), "Неверная причина ошибки.");
         }
     }
@@ -95,7 +97,7 @@ class UserControllerTest {
         try {
             userController.create(user);
         } catch (Exception e) {
-            assertFalse(userController.findAll().contains(user), "Пользователь был добавлен.");
+            assertFalse(userController.findAllUsers().contains(user), "Пользователь был добавлен.");
             assertEquals("Неверный формат логина.", e.getMessage(), "Неверная причина ошибки.");
         }
     }
@@ -110,7 +112,7 @@ class UserControllerTest {
         try {
             userController.create(user);
         } catch (Exception e) {
-            assertFalse(userController.findAll().contains(user), "Пользователь был добавлен.");
+            assertFalse(userController.findAllUsers().contains(user), "Пользователь был добавлен.");
             assertEquals("Неверный формат логина.", e.getMessage(), "Неверная причина ошибки.");
         }
     }
@@ -124,8 +126,8 @@ class UserControllerTest {
         final String nameOld = user.getName();
         assertTrue(user.getName().isEmpty(), "Имя не является недопустимым.");
         userController.create(user);
-        assertTrue(userController.findAll().contains(user), "Пользователь не был добавлен.");
-        User updUser = (User) userController.findAll().toArray()[0];
+        assertTrue(userController.findAllUsers().contains(user), "Пользователь не был добавлен.");
+        User updUser = (User) userController.findAllUsers().toArray()[0];
         assertNotEquals(nameOld, updUser.getName(), "Имя пользователя не было обновлено.");
         assertEquals(updUser.getLogin(), updUser.getName(),
                 "Имя пользователя после изменения не соответствует логину.");
@@ -142,12 +144,8 @@ class UserControllerTest {
         try {
             userController.create(user);
         } catch (Exception e) {
-            assertFalse(userController.findAll().contains(user), "Пользователь был добавлен.");
+            assertFalse(userController.findAllUsers().contains(user), "Пользователь был добавлен.");
             assertEquals("Неверная дата рождения.", e.getMessage(), "Неверная причина ошибки.");
         }
-
-
     }
-
-
 }

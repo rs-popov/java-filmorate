@@ -1,29 +1,38 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class User {
-    @Positive
     private int id;
-    private static int counter;
+
+    @NonNull
     @Email
     private String email;
+
+    @NonNull
     @Pattern(regexp = "^\\S*$")
     private String login;
+
+    @NonNull
     private String name;
+
+    @NonNull
     @PastOrPresent
     private LocalDate birthday;
 
-    public User(String email, String login, String name, LocalDate birthday) {
-        this.email = email;
-        this.login = login;
-        this.name = name;
-        this.birthday = birthday;
-        this.id = ++counter;
+    private final Set<Integer> friends = new HashSet<>();
+
+    public void addFriend(int friendId) {
+        friends.add(friendId);
+    }
+
+    public void deleteFriend(int friendId) {
+        friends.remove(friendId);
     }
 }
