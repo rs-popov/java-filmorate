@@ -25,7 +25,9 @@ public class FilmService {
     }
 
     public Film getFilmById(int id) {
-        return filmStorage.getFilmById(id);
+        return filmStorage.getFilmById(id).orElseThrow(() -> {
+            throw new ObjectNotFoundException("Фильм не найден.");
+        });
     }
 
     public Film addFilm(Film film) {
@@ -41,8 +43,9 @@ public class FilmService {
     }
 
     public void addLike(int filmId, int userId) {
-        Film film = filmStorage.getFilmById(filmId);
-        filmStorage.getFilmById(filmId).addLike(userId);
+        Film film = getFilmById(filmId);
+        film.addLike(userId);
+        filmStorage.updateFilm(film);
         log.info("Добавлен лайк фильму {}. ", film.getName());
     }
 
@@ -54,11 +57,12 @@ public class FilmService {
     }
 
     public void deleteLike(int filmId, int userId) {
-        Film film = filmStorage.getFilmById(filmId);
+        Film film = getFilmById(filmId);
         if (!film.getLikes().contains(userId)) {
             throw new ObjectNotFoundException("Лайк от пользователя {id=" + userId + "} не найден.");
         } else {
             film.deleteLike(userId);
+            filmStorage.updateFilm(film);
             log.info("Удален лайк фильму {}. ", film.getName());
         }
     }

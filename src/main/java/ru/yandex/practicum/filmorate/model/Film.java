@@ -4,10 +4,10 @@ import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@Builder
 public class Film implements Comparable<Film> {
     private int id;
 
@@ -26,7 +26,12 @@ public class Film implements Comparable<Film> {
     @Positive
     private int duration;
 
-    private final Set<Integer> likes = new HashSet<>();
+    private Set<Genre> genres;
+
+    @NonNull
+    private MPARating mpa;
+
+    private Set<Integer> likes;
 
     public void addLike(int userId) {
         likes.add(userId);
