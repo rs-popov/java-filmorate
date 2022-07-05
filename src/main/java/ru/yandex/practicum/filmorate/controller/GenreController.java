@@ -29,7 +29,7 @@ public class GenreController {
         if (id != null) {
             return genreService.getGenreById(id);
         } else {
-            throw new InternalErrorException("");
+            throw new InternalErrorException("Произошла ошибка. Неверный идентификатор жанра.");
         }
     }
 }

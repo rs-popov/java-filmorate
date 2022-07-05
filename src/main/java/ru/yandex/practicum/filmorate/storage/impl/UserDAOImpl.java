@@ -17,9 +17,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Primary
@@ -115,11 +113,16 @@ public class UserDAOImpl implements UserStorage {
                 .birthday(resultSet.getDate("USER_BIRTHDAY").toLocalDate())
                 .build();
 
-        String sqlQuery = "select FRIEND_ID from FRIENDSHIP where USER_ID=?";
-        HashSet<Integer> friends = new HashSet<>(jdbcTemplate.query(sqlQuery,
-                (rs, num) -> rs.getInt("FRIEND_ID"), resultSet.getInt("USER_ID")));
+        HashSet<Integer> friends = getFriendsByUserId(user.getId());
         friends.forEach(user::addFriend);
         return user;
+    }
+
+    private HashSet<Integer> getFriendsByUserId(int id){
+        String sqlQuery = "select FRIEND_ID from FRIENDSHIP where USER_ID=?";
+        List<Integer> friendsId = jdbcTemplate.query(sqlQuery,
+                (rs, num) -> rs.getInt("FRIEND_ID"), id);
+        return new HashSet<>(friendsId);
     }
 
     private boolean validate(User user) {

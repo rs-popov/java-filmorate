@@ -10,5 +10,5 @@ public interface GenresDAO {
 
     Optional<Genre> getGenreById(int id);
 
-    HashSet<Genre> getGenresByFilmId(int id);
+    Set<Genre> getGenresByFilmId(int id);
 }

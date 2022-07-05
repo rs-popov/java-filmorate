@@ -39,7 +39,7 @@ public class GenresDAOImpl implements GenresDAO {
     }
 
     @Override
-    public HashSet<Genre> getGenresByFilmId(int id) {
+    public Set<Genre> getGenresByFilmId(int id) {
         String sqlQuery = "select g.GENRE_ID, g.GENRE_NAME from GENRES AS g " +
                 "LEFT OUTER JOIN FILM_GENRES AS fg ON g.GENRE_ID=fg.GENRE_ID " +
                 " where fg.FILM_ID = ?";
