@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
@@ -10,7 +9,6 @@ import java.util.Collection;
 
 @RestController
 @RequestMapping("/users/{id}/friends")
-@Slf4j
 public class FriendsController {
     private final UserService userService;
 
